@@ -1,0 +1,5 @@
+/* assets/styles/layout.qss */
+
+QWidget {
+    background-color: #f8f9fa;
+}
