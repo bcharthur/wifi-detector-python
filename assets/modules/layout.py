@@ -13,12 +13,13 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Application avec Menu Latéral")
+        self.resize(800, 500)  # Définir la taille initiale de la fenêtre (largeur, hauteur)
 
         # Widget principal
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        # Layouts
+        # Layouts principaux
         self.main_layout = QHBoxLayout()
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -29,25 +30,12 @@ class MainWindow(QMainWindow):
         self.sidebar_layout.setSpacing(10)  # Espacement entre les éléments
         self.sidebar_layout.setContentsMargins(10, 10, 10, 10)  # Marges autour du contenu de la sidebar
 
-        # Layout pour le contenu de la page (avec le bouton toggle au-dessus)
-        self.content_with_toggle_layout = QVBoxLayout()
-        self.content_with_toggle_layout.setSpacing(0)
-        self.content_with_toggle_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Layout pour le contenu des pages (Index1 et Index2)
-        self.content_layout = QVBoxLayout()
-        self.content_layout.setSpacing(0)
-        self.content_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Widgets
+        # Widgets de la sidebar
         self.sidebar = QWidget()
         self.sidebar.setLayout(self.sidebar_layout)
-        self.content = QWidget()
-        self.content.setLayout(self.content_with_toggle_layout)
 
-        # Définir les politiques de taille
+        # Définir les politiques de taille de la sidebar
         self.sidebar.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self.content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Titre de la sidebar avec hauteur fixe et fond blanc
         self.sidebar_title = QLabel("Menu Principal")
@@ -60,13 +48,6 @@ class MainWindow(QMainWindow):
         """)
         self.sidebar_title.setAlignment(Qt.AlignCenter)  # Centrer le texte
         self.sidebar_layout.addWidget(self.sidebar_title)
-
-        # Bouton pour basculer le menu latéral avec une icône SVG (bars.svg)
-        self.toggle_button = QPushButton()
-        self.toggle_button.setIcon(QIcon(self.resource_path("bars.svg")))
-        self.toggle_button.setIconSize(QSize(24, 24))  # Taille de l'icône
-        self.toggle_button.setFixedSize(40, 40)  # Taille du bouton
-        self.toggle_button.clicked.connect(self.toggle_sidebar)
 
         # Créer les boutons avec icônes pour le menu latéral
         self.home_button = self.create_sidebar_button("Home", "home.svg")
@@ -82,11 +63,48 @@ class MainWindow(QMainWindow):
         self.home_button.clicked.connect(self.show_home_page)
         self.user_button.clicked.connect(self.show_user_page)
 
-        # Ajouter le bouton toggle au layout (il restera toujours visible)
-        self.content_with_toggle_layout.addWidget(self.toggle_button)
+        # Créer la topbar
+        self.topbar = QWidget()
+        self.topbar_layout = QHBoxLayout()
+        self.topbar_layout.setContentsMargins(10, 10, 10, 10)  # Marges autour du contenu de la topbar
+        self.topbar_layout.setSpacing(0)
+        self.topbar.setLayout(self.topbar_layout)
+        self.topbar.setFixedHeight(60)  # Hauteur fixe pour la topbar
+        self.topbar.setStyleSheet("background-color: #f0f0f0;")  # Couleur de fond de la topbar
 
-        # Ajouter le layout de contenu des pages juste en dessous du bouton toggle
-        self.content_with_toggle_layout.addLayout(self.content_layout)
+        # Bouton pour basculer le menu latéral avec une icône SVG (bars.svg)
+        self.toggle_button = QPushButton()
+        self.toggle_button.setIcon(QIcon(self.resource_path("bars.svg")))
+        self.toggle_button.setIconSize(QSize(24, 24))  # Taille de l'icône
+        self.toggle_button.setFixedSize(40, 40)  # Taille du bouton
+        self.toggle_button.clicked.connect(self.toggle_sidebar)
+
+        # Ajouter le bouton toggle à la topbar, aligné à droite
+        self.topbar_layout.addStretch()  # Espace flexible pour pousser le bouton à droite
+        self.topbar_layout.addWidget(self.toggle_button)
+
+        # Layout pour le contenu de la page (avec la topbar en haut)
+        self.content_with_topbar_layout = QVBoxLayout()
+        self.content_with_topbar_layout.setSpacing(0)
+        self.content_with_topbar_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Ajouter la topbar au layout de contenu
+        self.content_with_topbar_layout.addWidget(self.topbar)
+
+        # Layout pour le contenu des pages (Index1 et Index2)
+        self.content_layout = QVBoxLayout()
+        self.content_layout.setSpacing(0)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Ajouter le layout de contenu des pages juste en dessous de la topbar
+        self.content_with_topbar_layout.addLayout(self.content_layout)
+
+        # Widget de contenu principal
+        self.content = QWidget()
+        self.content.setLayout(self.content_with_topbar_layout)
+
+        # Définir les politiques de taille
+        self.content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Ajouter le menu latéral et le contenu principal au layout principal
         self.main_layout.addWidget(self.sidebar)
@@ -205,9 +223,6 @@ class MainWindow(QMainWindow):
             self.animation.finished.connect(on_finished)  # Connecte la fonction à appeler après l'animation
         self.animation.start()
 
-        # Optionnel: Connecter un signal pour ajuster les boutons en temps réel
-        # self.animation.valueChanged.connect(self.adjust_button_sizes)
-
     def adjust_button_sizes(self, value):
         """
         Ajuste la largeur des boutons en fonction de la largeur actuelle de la sidebar.
@@ -215,3 +230,4 @@ class MainWindow(QMainWindow):
         self.home_button.setMaximumWidth(value)
         self.user_button.setMaximumWidth(value)
         self.settings_button.setMaximumWidth(value)
+
