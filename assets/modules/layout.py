@@ -49,12 +49,16 @@ class MainWindow(QMainWindow):
         self.sidebar.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         self.content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        # Titre de la sidebar
+        # Titre de la sidebar avec hauteur fixe et fond blanc
         self.sidebar_title = QLabel("Menu Principal")
-        self.sidebar_title.setStyleSheet("font-size: 18px; font-weight: bold;")
+        self.sidebar_title.setFixedHeight(60)  # Hauteur fixe
+        self.sidebar_title.setStyleSheet("""
+            background-color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+        """)
         self.sidebar_title.setAlignment(Qt.AlignCenter)  # Centrer le texte
-
-        # Ajouter le titre au début du layout de la sidebar
         self.sidebar_layout.addWidget(self.sidebar_title)
 
         # Bouton pour basculer le menu latéral avec une icône SVG (bars.svg)
