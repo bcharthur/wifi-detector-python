@@ -1,7 +1,7 @@
 # templates/page1/index.py
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
 
-class Index1(QWidget):
+class Index2(QWidget):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
