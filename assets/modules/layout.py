@@ -1,4 +1,3 @@
-# layout.py
 import os
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout, QSizePolicy
@@ -6,6 +5,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QSize, Qt
 from templates.page1.index import Index1
+from templates.page2.index import Index2
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -22,9 +23,18 @@ class MainWindow(QMainWindow):
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.central_widget.setLayout(self.main_layout)
+
+        # Layout pour la sidebar
         self.sidebar_layout = QVBoxLayout()
         self.sidebar_layout.setSpacing(10)  # Espacement entre les éléments
         self.sidebar_layout.setContentsMargins(10, 10, 10, 10)  # Marges autour du contenu de la sidebar
+
+        # Layout pour le contenu de la page (avec le bouton toggle au-dessus)
+        self.content_with_toggle_layout = QVBoxLayout()
+        self.content_with_toggle_layout.setSpacing(0)
+        self.content_with_toggle_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Layout pour le contenu des pages (Index1 et Index2)
         self.content_layout = QVBoxLayout()
         self.content_layout.setSpacing(0)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
@@ -33,7 +43,7 @@ class MainWindow(QMainWindow):
         self.sidebar = QWidget()
         self.sidebar.setLayout(self.sidebar_layout)
         self.content = QWidget()
-        self.content.setLayout(self.content_layout)
+        self.content.setLayout(self.content_with_toggle_layout)
 
         # Définir les politiques de taille
         self.sidebar.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
@@ -64,8 +74,15 @@ class MainWindow(QMainWindow):
         self.sidebar_layout.addWidget(self.user_button)
         self.sidebar_layout.addWidget(self.settings_button)
 
-        # Ajouter des widgets au contenu principal
-        self.content_layout.addWidget(self.toggle_button)
+        # Connecter les boutons aux fonctions de navigation
+        self.home_button.clicked.connect(self.show_home_page)
+        self.user_button.clicked.connect(self.show_user_page)
+
+        # Ajouter le bouton toggle au layout (il restera toujours visible)
+        self.content_with_toggle_layout.addWidget(self.toggle_button)
+
+        # Ajouter le layout de contenu des pages juste en dessous du bouton toggle
+        self.content_with_toggle_layout.addLayout(self.content_layout)
 
         # Ajouter le menu latéral et le contenu principal au layout principal
         self.main_layout.addWidget(self.sidebar)
@@ -84,6 +101,29 @@ class MainWindow(QMainWindow):
         # Instance de la page Index1
         self.index1 = Index1()
         self.content_layout.addWidget(self.index1)
+
+    def show_home_page(self):
+        # Supprimer tous les widgets actuels du layout de contenu
+        self.clear_content_layout()
+
+        # Ajouter la page Index1 (page Home)
+        self.index1 = Index1()
+        self.content_layout.addWidget(self.index1)
+
+    def show_user_page(self):
+        # Supprimer tous les widgets actuels du layout de contenu
+        self.clear_content_layout()
+
+        # Ajouter la page Index2 (page User)
+        self.index2 = Index2()
+        self.content_layout.addWidget(self.index2)
+
+    def clear_content_layout(self):
+        # Supprimer uniquement les widgets de content_layout (pas le bouton toggle)
+        for i in reversed(range(self.content_layout.count())):
+            widget = self.content_layout.itemAt(i).widget()
+            if widget is not None:
+                widget.deleteLater()
 
     def create_sidebar_button(self, text, icon_filename):
         """
