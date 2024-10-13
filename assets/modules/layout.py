@@ -128,12 +128,14 @@ class MainWindow(QMainWindow):
     def create_sidebar_button(self, text, icon_filename):
         """
         Crée un bouton de la sidebar avec une icône SVG.
+        Ajuste la politique de taille pour permettre l'expansion horizontale.
         """
         button = QPushButton(text)
-        button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)  # Permet l'expansion horizontale
         icon_path = self.resource_path(icon_filename)
         button.setIcon(QIcon(icon_path))
         button.setIconSize(QSize(24, 24))  # Taille de l'icône
+        button.setStyleSheet("text-align: left; padding: 10px;")  # Optionnel: alignement du texte
         return button
 
     def resource_path(self, filename):
@@ -152,20 +154,37 @@ class MainWindow(QMainWindow):
             self.home_button.setText("")
             self.user_button.setText("")
             self.settings_button.setText("")
+
+            # Optionnel: Ajuster les icônes si nécessaire
+            # self.home_button.setIcon(QIcon(self.resource_path("home_collapsed.svg")))
+            # self.user_button.setIcon(QIcon(self.resource_path("user_collapsed.svg")))
+            # self.settings_button.setIcon(QIcon(self.resource_path("settings_collapsed.svg")))
         else:
             # Agrandir la sidebar à sa largeur normale et attendre la fin de l'animation pour afficher les textes et le titre
             self.animate_sidebar(self.sidebar_width, self.show_sidebar_text)
 
+        # Inverser l'état de la sidebar une seule fois
         self.sidebar_shown = not self.sidebar_shown
 
     def show_sidebar_text(self):
         """
         Réaffiche le texte des boutons et change le titre après que l'animation est terminée.
+        Ajuste la largeur maximale des boutons pour correspondre à la largeur déployée de la sidebar.
         """
         self.sidebar_title.setText("Menu Principal")  # Remettre le titre complet
         self.home_button.setText("Home")
         self.user_button.setText("User")
         self.settings_button.setText("Settings")
+
+        # Optionnel: Réajuster les icônes si nécessaire
+        # self.home_button.setIcon(QIcon(self.resource_path("home.svg")))
+        # self.user_button.setIcon(QIcon(self.resource_path("user.svg")))
+        # self.settings_button.setIcon(QIcon(self.resource_path("settings.svg")))
+
+        # Optionnel: Forcer la mise à jour des boutons
+        self.home_button.updateGeometry()
+        self.user_button.updateGeometry()
+        self.settings_button.updateGeometry()
 
     def animate_sidebar(self, width, on_finished=None):
         """
@@ -176,6 +195,19 @@ class MainWindow(QMainWindow):
         self.animation.setStartValue(self.sidebar.width())
         self.animation.setEndValue(width)
         self.animation.setEasingCurve(QEasingCurve.InOutQuart)
+        self.animation.valueChanged.connect(self.adjust_button_sizes)
+
         if on_finished:
             self.animation.finished.connect(on_finished)  # Connecte la fonction à appeler après l'animation
         self.animation.start()
+
+        # Optionnel: Connecter un signal pour ajuster les boutons en temps réel
+        # self.animation.valueChanged.connect(self.adjust_button_sizes)
+
+    def adjust_button_sizes(self, value):
+        """
+        Ajuste la largeur des boutons en fonction de la largeur actuelle de la sidebar.
+        """
+        self.home_button.setMaximumWidth(value)
+        self.user_button.setMaximumWidth(value)
+        self.settings_button.setMaximumWidth(value)
