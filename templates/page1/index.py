@@ -2,8 +2,9 @@
 from PyQt5.QtWidgets import (
     QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QScrollArea, QSizePolicy, QPushButton
 )
-from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QSize, Qt
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QFont, QIcon, QPixmap, QPainter, QColor
+from PyQt5.QtSvg import QSvgRenderer
 from assets.modules.modal import Modal
 from templates.page1.functions.wifi_card_detect import detect_wifi_adapters
 import os
@@ -148,7 +149,7 @@ class Index1(QWidget):
 
         # Bouton Refresh
         refresh_button = QPushButton()
-        refresh_button.setIcon(QIcon(self.resource_path("refresh.svg")))
+        refresh_button.setIcon(self.create_white_icon(self.resource_path("refresh.svg"), QSize(24, 24)))
         refresh_button.setIconSize(QSize(24, 24))
         refresh_button.setFixedSize(40, 40)
         refresh_button.setToolTip("Actualiser la liste des cartes Wi-Fi")
@@ -183,12 +184,51 @@ class Index1(QWidget):
         # Ajouter le cadre au layout principal
         main_layout.addWidget(wifi_frame)
 
+    def create_white_icon(self, svg_path, size):
+        """
+        Charge un fichier SVG, le colore en blanc et retourne un QIcon.
+
+        Args:
+            svg_path (str): Chemin vers le fichier SVG.
+            size (QSize): Taille souhaitée de l'icône.
+
+        Returns:
+            QIcon: Icône teintée en blanc.
+        """
+        # Créer un QPixmap avec transparence
+        pixmap = QPixmap(size)
+        pixmap.fill(Qt.transparent)
+
+        # Utiliser QPainter pour rendre le SVG sur le pixmap
+        renderer = QSvgRenderer(svg_path)
+        painter = QPainter(pixmap)
+        renderer.render(painter)
+        painter.end()
+
+        # Créer un QPixmap blanc
+        white_pixmap = QPixmap(size)
+        white_pixmap.fill(Qt.white)
+
+        # Appliquer le pixmap blanc en mode SourceIn pour teinter en blanc
+        white_icon = QPixmap(size)
+        white_icon.fill(Qt.transparent)
+        painter = QPainter(white_icon)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+        painter.drawPixmap(0, 0, white_pixmap)
+        painter.end()
+
+        return QIcon(white_icon)
+
     def resource_path(self, filename):
         """
         Retourne le chemin absolu vers le fichier d'icône SVG.
         """
         base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'assets', 'icons')
-        return os.path.join(base_path, filename)
+        full_path = os.path.join(base_path, filename)
+        # print(f"Chemin de l'icône '{filename}': {full_path}")  # Ligne de débogage
+        return full_path
 
     def load_wifi_cards(self):
         """
