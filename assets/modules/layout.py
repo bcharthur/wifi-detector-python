@@ -79,9 +79,9 @@ class MainWindow(QMainWindow):
         self.toggle_button.setFixedSize(40, 40)  # Taille du bouton
         self.toggle_button.clicked.connect(self.toggle_sidebar)
 
-        # Ajouter le bouton toggle à la topbar, aligné à droite
-        self.topbar_layout.addStretch()  # Espace flexible pour pousser le bouton à droite
+        # Ajouter le bouton toggle à la topbar, aligné à gauche
         self.topbar_layout.addWidget(self.toggle_button)
+        self.topbar_layout.addStretch()  # Espace flexible pour pousser les autres éléments à droite
 
         # Layout pour le contenu de la page (avec la topbar en haut)
         self.content_with_topbar_layout = QVBoxLayout()
@@ -230,4 +230,3 @@ class MainWindow(QMainWindow):
         self.home_button.setMaximumWidth(value)
         self.user_button.setMaximumWidth(value)
         self.settings_button.setMaximumWidth(value)
-
