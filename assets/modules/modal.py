@@ -1,5 +1,5 @@
 # assets/modules/modal.py
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QPushButton
 from PyQt5.QtCore import Qt
 
 class Modal(QDialog):
@@ -15,11 +15,11 @@ class Modal(QDialog):
         self.layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(self.layout)
 
-        # Contenu de la modal
-        self.label = QLabel("Ceci est une fenêtre modale de test.")
-        self.label.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(self.label)
-
+        # Bouton de fermeture commun à toutes les modales
         self.close_button = QPushButton("Fermer")
         self.close_button.clicked.connect(self.close)
         self.layout.addWidget(self.close_button)
+
+    def setup_content(self):
+        """Méthode à surcharger pour définir le contenu spécifique de la modale."""
+        pass
